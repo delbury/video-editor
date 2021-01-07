@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Video Editor</title>
+  <link rel="stylesheet" href="./style/index.css">
+</head>
+<body>
+  <div id="container"></div>
+  <div style="margin-top: 10px;">
+    <button id="btn-load">加载视频</button>
+    <button id="btn-play">播放</button>
+    <button id="btn-pause">暂停</button>
+  </div>
+  
+  <script src="./js/third-party/fabric.js"></script>
+  <script type="module">
+    import { VideoEditor } from './js/main.js';
+    const ve = new VideoEditor(document.getElementById('container'));
+    window.ve = ve;
+
+    document.getElementById('btn-load').onclick = () => {
+      ve.loadVideo('./resource/test.mp4');
+    };
+    document.getElementById('btn-play').onclick = () => {
+      ve.play();
+    };
+    document.getElementById('btn-pause').onclick = () => {
+      ve.pause();
+    };
+  </script>
+</body>
+</html>
