@@ -2,3 +2,8 @@
   border: 1px dashed skyblue;
   font-size: 0;
 }
+
+#imgs > li:hover {
+  cursor: pointer;
+  text-decoration: line-through;
+}

@@ -1,4 +1,5 @@
 import { WatermarkEditor } from './WatermarkEditor.js';
+import { VideoController } from './VideoController.js';
 
 export class VideoEditor {
   constructor(container, width = 800, height = 480) {
@@ -41,7 +42,6 @@ export class VideoEditor {
   initVideo() {
     this.video = document.createElement('video');
     this.video.preload = 'metadata';
-    this.videoPlaying = false;
     this.videoDrawParams = {
       scale: 1,
       width: this.width,
@@ -50,7 +50,10 @@ export class VideoEditor {
       offsetY: 0,
     };
 
-    this.video.onloadeddata = ev => {
+    this.vc = new VideoController(this.video);
+    this.vc.on('jumped', () => this.play());
+
+    this.video.addEventListener('loadeddata', ev => {
       this.drawVideoTick();
 
       // 宽高比自适应
@@ -66,17 +69,11 @@ export class VideoEditor {
         this.videoDrawParams.height = this.videoDrawParams.scale * videoHeight;
         this.videoDrawParams.offsetY = (this.height - this.videoDrawParams.height) / 2;
       }
-
-      console.log()
-    };
+    });
   }
 
   // 加载视频
   loadVideo(src) {
-    if (!this.video) {
-      this.initVideo();
-    }
-
     this.video.src = src;
   }
 
@@ -94,32 +91,29 @@ export class VideoEditor {
 
   // 连续绘制
   drawVideo() {
-    if (!this.videoPlaying) {
+    if (!this.vc.playing) {
       this.reqAF = null;
       return;
     }
     this.reqAF = requestAnimationFrame(() => {
       this.drawVideoTick();
-
       return this.drawVideo();
     });
   }
 
   // 视频播放
   play() {
-    if (!this.video) return;
+    if (!this.vc) return;
 
-    this.videoPlaying = true;
-    this.video.play();
+    this.vc.play();
     this.drawVideo();
   }
 
   // 视频暂停
   pause() {
-    if (!this.video) return;
+    if (!this.vc) return;
 
-    this.videoPlaying = false;
-    this.video.pause();
+    this.vc.pause();
   }
 
   get width() {

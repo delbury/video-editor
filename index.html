@@ -8,11 +8,18 @@
 </head>
 <body>
   <div id="container"></div>
+  <div style="width: 800px; display: flex; align-items: center; justify-content: space-between;">
+    <input style="flex: 1;" id="progress" type="range" value="0" min="0" max="100" step="0.1">
+    <span id="video-time" style="font-size: 12px; width: 90px; text-align: right;">00:00 / 00:00</span>
+  </div>
   <div style="margin-top: 10px;">
     <button id="btn-load">加载视频</button>
     <button id="btn-play">播放</button>
     <button id="btn-pause">暂停</button>
+    <button id="btn-text">添加文本</button>
+    <input id="file" type="file" accept=".jpg, .png, .gif">
   </div>
+  <ol id="imgs"></ol>
   
   <script src="./js/third-party/fabric.js"></script>
   <script type="module">
@@ -20,8 +27,26 @@
     const ve = new VideoEditor(document.getElementById('container'));
     window.ve = ve;
 
+    let progressDragging = false;
+    const progress = document.getElementById('progress');
+    const videoTime = document.getElementById('video-time');
+
+    progress.oninput = ev => {
+      progressDragging = true;
+    };
+    progress.onchange = ev => {
+      progressDragging = false;
+      ve.vc.jumpVideoByPercent(+progress.value);
+    };
     document.getElementById('btn-load').onclick = () => {
       ve.loadVideo('./resource/test.mp4');
+
+      const fn = ev => {
+        if(!progressDragging) progress.value = ev.percent;
+        videoTime.innerText = `${ev.formatedCurrentTime} / ${ev.formatedDuration}`;
+      };
+      ve.vc.on('loadeddata', fn);
+      ve.vc.on('timeupdate', fn);
     };
     document.getElementById('btn-play').onclick = () => {
       ve.play();
@@ -29,6 +54,38 @@
     document.getElementById('btn-pause').onclick = () => {
       ve.pause();
     };
+    document.getElementById('btn-text').onclick = () => {
+      ve.we.addText();
+    };
+    document.getElementById('file').onchange = function(ev) {
+      const file = ev.target.files[0];
+      if(file) {
+        ve.we.addImage(file, listUpdate);
+      }
+      this.value = '';
+    };
+    document.getElementById('imgs').onclick = ev => {
+      if(ev.target.tagName === 'LI') {
+        ve.we.removeImageByIndex(ev.target.dataset.index, listUpdate);
+      }
+    };
+    function listUpdate(imgs) {
+      const ul = document.getElementById('imgs');
+      const lis = imgs.map((img, index) => `<li data-index="${index}">图片${index + 1}</li>`);
+      ul.innerHTML = lis.join('');
+    }
+
+    const params = {
+      name: 'hhh',
+      age: 17,
+    }
+    fetch('http://127.0.0.1:3000/createVideo', {
+      method: 'post',
+      headers: {
+        'content-type': 'application/json;charset=UTF-8',
+      },
+      body: JSON.stringify(params),
+    });
   </script>
 </body>
 </html>
