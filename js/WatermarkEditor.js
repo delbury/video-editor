@@ -19,6 +19,7 @@ export class WatermarkEditor {
   addText(text, callback) {
     const ftext = new fabric.IText(text ?? '添加文本');
     ftext.setControlsVisibility({ mb: false, mt: false, mr: false, ml: false });
+    ftext.on('selected', this.handleSelected);
     this.fcanvas.add(ftext);
     this.#ftexts.push(ftext);
     callback && callback(this.#ftexts);
@@ -38,6 +39,7 @@ export class WatermarkEditor {
     if(source instanceof Image) {
       const fimg = new fabric.Image(source, { ...this.initImageSize(source) });
       fimg.setControlsVisibility({ mb: false, mt: false, mr: false, ml: false });
+      fimg.on('selected', this.handleSelected);
       this.fcanvas.add(fimg);
       this.#fimages.push(fimg);
       
@@ -47,6 +49,7 @@ export class WatermarkEditor {
       img.onload = ev => {
         const fimg = new fabric.Image(img, { ...this.initImageSize(img) });
         fimg.setControlsVisibility({ mb: false, mt: false, mr: false, ml: false });
+        fimg.on('selected', this.handleSelected);
         this.fcanvas.add(fimg);
         this.#fimages.push(fimg);
 
@@ -89,6 +92,20 @@ export class WatermarkEditor {
       };
     }
     return {};
+  }
+
+  // 移动到顶层
+  moveToTop(fobj) {
+    this.fcanvas.moveTo(fobj, this.fcanvas._objects.length - 1);
+  }
+
+  // 选中回调
+  handleSelected = (ev) => {
+    setTimeout(() => {
+      if(ev.selected.length === 1) {
+        this.moveToTop(ev.selected[0]);
+      }
+    });
   }
 
   get width() {

@@ -19,8 +19,11 @@
     <button id="btn-text">添加文本</button>
     <input id="file" type="file" accept=".jpg, .png, .gif">
   </div>
-  <ol id="imgs"></ol>
-  
+  <div style="display: flex;">
+    <ol id="imgs"></ol>
+    <ol id="txts" style="margin-left: 50px;"></ol>
+  </div>
+
   <script src="./js/third-party/fabric.js"></script>
   <script type="module">
     import { VideoEditor } from './js/main.js';
@@ -55,23 +58,37 @@
       ve.pause();
     };
     document.getElementById('btn-text').onclick = () => {
-      ve.we.addText();
+      ve.we.addText('添加文本', txtListUpdate);
     };
     document.getElementById('file').onchange = function(ev) {
       const file = ev.target.files[0];
       if(file) {
-        ve.we.addImage(file, listUpdate);
+        ve.we.addImage(file, imgListUpdate);
       }
       this.value = '';
     };
     document.getElementById('imgs').onclick = ev => {
       if(ev.target.tagName === 'LI') {
-        ve.we.removeImageByIndex(ev.target.dataset.index, listUpdate);
+        ve.we.removeImageByIndex(ev.target.dataset.index, imgListUpdate);
       }
     };
-    function listUpdate(imgs) {
+    document.getElementById('txts').onclick = ev => {
+      if(ev.target.tagName === 'LI') {
+        ve.we.removeTextByIndex(ev.target.dataset.index, txtListUpdate);
+      }
+    };
+
+    // 更新图片列表
+    function imgListUpdate(imgs) {
       const ul = document.getElementById('imgs');
       const lis = imgs.map((img, index) => `<li data-index="${index}">图片${index + 1}</li>`);
+      ul.innerHTML = lis.join('');
+    }
+
+    // 更新文本列表
+    function txtListUpdate(imgs) {
+      const ul = document.getElementById('txts');
+      const lis = imgs.map((img, index) => `<li data-index="${index}">文本${index + 1}</li>`);
       ul.innerHTML = lis.join('');
     }
 
@@ -79,13 +96,13 @@
       name: 'hhh',
       age: 17,
     }
-    fetch('http://127.0.0.1:3000/createVideo', {
-      method: 'post',
-      headers: {
-        'content-type': 'application/json;charset=UTF-8',
-      },
-      body: JSON.stringify(params),
-    });
+    // fetch('http://127.0.0.1:3000/createVideo', {
+    //   method: 'post',
+    //   headers: {
+    //     'content-type': 'application/json;charset=UTF-8',
+    //   },
+    //   body: JSON.stringify(params),
+    // });
   </script>
 </body>
 </html>

@@ -3,7 +3,8 @@
   font-size: 0;
 }
 
-#imgs > li:hover {
+#imgs > li:hover,
+#txts > li:hover {
   cursor: pointer;
   text-decoration: line-through;
 }
