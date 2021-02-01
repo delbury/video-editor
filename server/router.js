@@ -6,11 +6,28 @@ const fs = require('fs').promises;
 const testFileUrl = path.resolve(__dirname, '../resource/test.mp4');
 const outputName = '/ticks.jpg';
 const outputDir = path.resolve(__dirname, '../resource' + outputName);
-const videoEditor = new VideoEditor();
+const outputCutFile = path.resolve(__dirname, '../resource/cut.mp4');
 
+const videoEditor = new VideoEditor();
 const router = new Router();
 
 router
+  // 视频裁剪
+  .post('/api/cutVideo', async ctx => {
+    const range = ctx.request.body.range ?? [];
+
+    try {
+      const url = await videoEditor.cutVideoByFFmpeg(testFileUrl, range, outputCutFile);
+
+      ctx.body = {
+        msg: 'ok',
+        processedfileUrl: 'url',
+      };
+    } catch {
+      ctx.status = 500;
+    }
+  })
+  // 获取帧拼图
   .get('/api/tickImages', async ctx => {
     try {
       try {

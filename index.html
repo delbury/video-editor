@@ -19,6 +19,7 @@
     <button id="btn-pause">暂停</button>
     <button id="btn-text">添加文本</button>
     <input id="file" type="file" accept=".jpg, .png, .gif">
+    <button id="btn-cut">裁剪</button>
   </div>
   <div style="display: flex;">
     <ol id="imgs"></ol>
@@ -95,6 +96,20 @@
         ve.we.removeTextByIndex(ev.target.dataset.index, txtListUpdate);
       }
     };
+    document.getElementById('btn-cut').onclick = ev => {
+      const range = ve.vc.getRange();
+      // const range = [41, 188];
+
+      fetch('//127.0.0.1:3000/api/cutVideo', {
+        method: 'post',
+        headers: {
+          'content-type': 'application/json;charset=UTF-8',
+        },
+        body: JSON.stringify({
+          range,
+        }),
+      })
+    };
 
     // 更新图片列表
     function imgListUpdate(imgs) {
@@ -110,17 +125,6 @@
       ul.innerHTML = lis.join('');
     }
 
-    // const params = {
-    //   name: 'hhh',
-    //   age: 17,
-    // }
-    // fetch('http://127.0.0.1:3000/createVideo', {
-    //   method: 'post',
-    //   headers: {
-    //     'content-type': 'application/json;charset=UTF-8',
-    //   },
-    //   body: JSON.stringify(params),
-    // });
   </script>
 </body>
 </html>

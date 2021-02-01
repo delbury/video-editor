@@ -79,6 +79,9 @@ export class VideoController extends Event {
   getRange(index = 0) {
     return this.#ranges[index];
   }
+  getRanges() {
+    return this.#ranges;
+  }
 
   // 设置播放范围
   setRange(start, end , index = 0) {

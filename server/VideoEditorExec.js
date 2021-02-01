@@ -2,7 +2,6 @@ const child_process = require('child_process');
 const fs = require('fs').promises;
 const path = require('path');
 
-
 class VideoEditor {
   static videoDurationReg = /Duration:\s(\d{2}):(\d{2}):(\d{2}\.\d{2}),/i;
   static videoFpsReg = /Stream.*Video.*,\s(\d+)\sfps,/i;
@@ -40,20 +39,45 @@ class VideoEditor {
   // ffmpeg 获取视频信息
   getVideoInfoByFFmpeg(fileUrl) {
     return new Promise((resolve, reject) => {
-      try {
-        child_process.exec(
-          `ffprobe -i ${fileUrl} -hide_banner`,
-          {},
-          (err, stdout, stderr) => {
-            resolve(this.resolveVideoInfo(stderr));
-          },
-        );
-      } catch(err) {
-        reject(err);
-      }
+      child_process.exec(
+        `ffprobe -i ${fileUrl} -hide_banner`,
+        {},
+        (err, stdout, stderr) => {
+          if(err) {
+            reject(err);
+          }
+          resolve(this.resolveVideoInfo(stderr));
+        },
+      );
     });
   }
 
+  // 视频裁剪
+  cutVideoByFFmpeg(fileUrl, range, outputPath) {
+    return new Promise((resolve, reject) => {
+      // 调用 ffmpeg
+      child_process.exec(
+        [
+          'ffmpeg',
+          '-y',
+          '-ss', range[0], '-i', fileUrl,
+          '-to', range[1], '-c', 'copy',
+          outputPath
+        ].join(' '),
+        {},
+        (err, stdout, stderr) => {
+          if(err) {
+            reject(err);
+            return;
+          }
+          resolve(fileUrl);
+          console.log('video has been cropped successfully');
+        }
+      )
+    });
+  }
+
+  // 加载视频，生成视频帧拼图
   loadVideo(inputUrl, outputUrl = 'ticks.jpg') {
     if(!inputUrl) throw new Error('must has an input url !');
 
@@ -82,9 +106,6 @@ class VideoEditor {
               console.log('created ticks successfully .');
               resolve();
             }
-            // console.log(err);
-            // console.log(stdout);
-            // console.log(stderr);
           }
         );
   
