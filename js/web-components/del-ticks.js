@@ -1,3 +1,7 @@
+/**
+ * events:
+ *  rangechange: ({ start: number, end: number }) => void, 选中范围改变
+ */
 export default class DelTicks extends HTMLElement {
   static tagName = 'del-ticks';
   constructor(props) {
@@ -93,6 +97,10 @@ export default class DelTicks extends HTMLElement {
               this.left = left;
             }
           }
+
+          // 触发事件
+          const event = new CustomEvent('rangechange', { detail: this.getRange() });
+          this.dispatchEvent(event);
         };
 
         const fnUp = () => {
@@ -124,7 +132,7 @@ export default class DelTicks extends HTMLElement {
     wrapper.append(this.img, this.range);
     this.append(wrapper);
 
-    this.setSrc();
+    // this.setSrc();
   }
 
   setSrc(url = '//127.0.0.1:3000/ticks.jpg') {

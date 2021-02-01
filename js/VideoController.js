@@ -7,6 +7,7 @@ import { Event } from './Event.js';
  *  jumped
  */
 export class VideoController extends Event {
+  #ranges = [[0, 0]]; // 播放范围
   constructor(video) {
     super();
     this.initController(video);
@@ -26,10 +27,13 @@ export class VideoController extends Event {
     this.videoInfo = {
       formatedDuration: 0,
     };
-    
-    this.video.addEventListener('loadeddata', ev => {
+
+    // 首帧加载
+    this.video.addEventListener('loadedmetadata', ev => {
       this.videoInfo.formatedDuration = VideoController.formatTime(this.video.duration);
-      this.emit('loadeddata', {
+      this.setRange(0, this.video.duration)
+
+      this.emit('loadedmetadata', {
         videoElement: this.video,
         percent: 0,
         currentTime: 0,
@@ -39,7 +43,13 @@ export class VideoController extends Event {
       });
     });
 
+    // 播放时间更新
     this.video.addEventListener('timeupdate', ev => {
+      const [start, end] = this.getRange();
+      if(this.video.currentTime < start || this.video.currentTime > end) {
+        this.video.currentTime = start;
+      }
+
       this.emit('timeupdate', {
         videoElement: this.video,
         percent: this.video.currentTime / this.video.duration * 100,
@@ -49,6 +59,8 @@ export class VideoController extends Event {
         formatedDuration: this.videoInfo.formatedDuration,
       });
     });
+
+    // 
   }
 
   // 视频跳转百分比
@@ -61,6 +73,21 @@ export class VideoController extends Event {
   jumpVideoByTime(time) {
     this.video.currentTime = time;
     this.emit('jumped');
+  }
+
+  // 获取播放范围
+  getRange(index = 0) {
+    return this.#ranges[index];
+  }
+
+  // 设置播放范围
+  setRange(start, end , index = 0) {
+    this.#ranges[index] = [start, end];
+  }
+
+  // 设置播放范围（百分比）
+  setRangePercent(start, end , index = 0) {
+    this.#ranges[index] = [start * this.video.duration, end * this.video.duration];
   }
 
   play() {

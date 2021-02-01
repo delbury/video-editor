@@ -10,7 +10,7 @@
   <div id="container"></div>
   <del-ticks id="ticks"></del-ticks>
   <div style="width: 802px; display: flex; align-items: center; justify-content: space-between; flex-wrap: nowrap;">
-    <input style="flex: 0 0 100%; margin: 2px 0;" id="progress" type="range" value="0" min="0" max="100" step="0.1">
+    <input style="flex: 0 0 100%; margin: 2px 0;" id="progress" type="range" value="0" min="0" max="100" step="0.1" disabled>
     <span id="video-time" style="margin-left: 5px; font-size: 12px; width: 90px; text-align: right; white-space: nowrap;">00:00 / 00:00</span>
   </div>
   <div style="margin-top: 10px;">
@@ -52,8 +52,9 @@
       const fn = ev => {
         if(!progressDragging) progress.value = ev.percent;
         videoTime.innerText = `${ev.formatedCurrentTime} / ${ev.formatedDuration}`;
+        progress.removeAttribute('disabled')
       };
-      ve.vc.on('loadeddata', fn);
+      ve.vc.on('loadedmetadata', fn);
       ve.vc.on('timeupdate', fn);
 
       fetch(BASE_URL + '/api/tickImages').then(async (res) => {
@@ -61,6 +62,13 @@
         ticks.setSrc(BASE_URL + json.url);
       })
     };
+
+    // 帧选中区域改变
+    ticks.addEventListener('rangechange', ev => {
+      ve.pause();
+      ve.vc.setRangePercent(ev.detail.start, ev.detail.end);
+    });
+
     document.getElementById('btn-play').onclick = () => {
       ve.play();
     };
@@ -102,10 +110,10 @@
       ul.innerHTML = lis.join('');
     }
 
-    const params = {
-      name: 'hhh',
-      age: 17,
-    }
+    // const params = {
+    //   name: 'hhh',
+    //   age: 17,
+    // }
     // fetch('http://127.0.0.1:3000/createVideo', {
     //   method: 'post',
     //   headers: {
