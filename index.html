@@ -19,7 +19,7 @@
     <button id="btn-pause">暂停</button>
     <button id="btn-text">添加文本</button>
     <input id="file" type="file" accept=".jpg, .png, .gif">
-    <button id="btn-cut">裁剪</button>
+    <button id="btn-create">生成</button>
   </div>
   <div style="display: flex;">
     <ol id="imgs"></ol>
@@ -96,19 +96,28 @@
         ve.we.removeTextByIndex(ev.target.dataset.index, txtListUpdate);
       }
     };
-    document.getElementById('btn-cut').onclick = ev => {
-      const range = ve.vc.getRange();
-      // const range = [41, 188];
+    document.getElementById('btn-create').onclick = ev => {
+      // // 裁剪
+      // const range = ve.vc.getRange();
+      // fetch('//127.0.0.1:3000/api/cutVideo', {
+      //   method: 'post',
+      //   headers: {
+      //     'content-type': 'application/json;charset=UTF-8',
+      //   },
+      //   body: JSON.stringify({
+      //     range,
+      //   }),
+      // });
 
-      fetch('//127.0.0.1:3000/api/cutVideo', {
+      // 水印
+      const data = ve.we.createDataURL();
+      fetch('//127.0.0.1:3000/api/watermask', {
         method: 'post',
         headers: {
           'content-type': 'application/json;charset=UTF-8',
         },
-        body: JSON.stringify({
-          range,
-        }),
-      })
+        body: JSON.stringify(data),
+      });
     };
 
     // 更新图片列表

@@ -52,6 +52,31 @@ class VideoEditor {
     });
   }
 
+  // 添加水印
+  addWatermask(videoPath, imagePath, outputPath, { width, height }) {
+    return new Promise((resolve, reject) => {
+      console.log('adding watermask...');
+      child_process.exec(
+        [
+          'ffmpeg',
+          '-y',
+          '-i', videoPath, '-i', imagePath,
+          '-c:a copy', '-filter_complex', `scale=${width}:${height},overlay`,
+          outputPath, '-hide_banner'
+        ].join(' '),
+        {},
+        (err, stdout, stderr) => {
+          if(err) {
+            reject(err);
+            return;
+          }
+          console.log('watermask has been added');
+          resolve();
+        }
+      );
+    });
+  }
+
   // 视频裁剪
   cutVideoByFFmpeg(fileUrl, range, outputPath) {
     return new Promise((resolve, reject) => {
@@ -70,8 +95,8 @@ class VideoEditor {
             reject(err);
             return;
           }
-          resolve(fileUrl);
           console.log('video has been cropped successfully');
+          resolve(fileUrl);
         }
       )
     });

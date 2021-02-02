@@ -15,6 +15,17 @@ export class WatermarkEditor {
     this.fcanvas.wrapperEl.style.top = '0px';
   }
 
+  // 生成图片
+  createDataURL() {
+    return {
+      data: this.fcanvas.toDataURL({
+        format: 'png',
+      }),
+      width: this.width,
+      height: this.height,
+    }
+  }
+
   // 添加文本
   addText(text, callback) {
     const ftext = new fabric.IText(text ?? '添加文本');
